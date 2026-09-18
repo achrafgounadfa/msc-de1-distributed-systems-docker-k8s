@@ -28,10 +28,15 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: flask-app
           image: achraf2026/msc-de1-flask-app:1.0.1
           imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: flask-app-config
           ports:
             - name: http
               containerPort: 5000
