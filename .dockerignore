@@ -1,0 +1,13 @@
+venv/
+.git/
+.gitignore
+.dockerignore
+__pycache__/
+*.pyc
+*.pyo
+.vscode/
+evidence/
+k8s/
+kind/
+security/
+README.md
