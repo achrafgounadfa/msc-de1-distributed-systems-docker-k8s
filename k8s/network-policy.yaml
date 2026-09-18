@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: flask-app-network-policy
+  namespace: msc-de1-project
+  labels:
+    app.kubernetes.io/name: flask-sample-app
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: msc-de1-project
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: flask-sample-app
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Autorise le trafic entrant uniquement sur le port 5000 depuis le namespace msc-de1-project ou les sondes de santé du cluster
+    - ports:
+        - protocol: TCP
+          port: 5000
+  egress:
+    # Autorise le trafic sortant nécessaire (requêtes DNS et réponses HTTP)
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+        - protocol: TCP
+          port: 5000
