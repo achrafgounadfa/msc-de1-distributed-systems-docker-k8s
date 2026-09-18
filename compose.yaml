@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: flask-sample-app:v1.0
+      image: achraf2026/msc-de1-flask-app:1.0.1
     container_name: flask-compose-app
     ports:
       - "5000:5000"
@@ -11,10 +11,21 @@ services:
       - PORT=5000
       - FLASK_RUN_HOST=0.0.0.0
       - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
     restart: unless-stopped
+
+    # --- Sécurité : privilèges réduits ---
     security_opt:
       - no-new-privileges:true
-    read_only: false
+    cap_drop:
+      - ALL
+    user: "1000:1000"
+
+    # --- Sécurité : système de fichiers en lecture seule ---
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5000/')\" || exit 1"]
       interval: 10s
