@@ -59,13 +59,24 @@ Optional:
 
 ## 4. How to Run the Original Application Locally
 
+
+> ⚠️ **Important Note for Windows Users:**  
+> Make sure the virtual environment `(venv)` is activated before executing any `python` or `unittest` command. If `(venv)` is not visible at the beginning of your terminal prompt, activate it first:
+>
+> - **Windows PowerShell:**  
+>   `.\venv\Scripts\activate`
+> - **Linux / macOS:**  
+>   `source venv/bin/activate`
+>
+> If you encounter a script execution policy error on PowerShell, run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned` before activating.
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/achrafgounadfa/msc-de1-distributed-systems-docker-k8s.git
 cd msc-de1-distributed-systems-docker-k8s
 
 # 2. Create and activate a Python virtual environment
-python -m venv venv
+python -m venv venv   
 
 # Windows PowerShell
 .\venv\Scripts\activate
@@ -86,14 +97,30 @@ The application is available at:
 
 ### Verify the routes
 
+Ouvre un DEUXIÈME terminal VS Code
+
+C'est important : ne ferme pas celui où Flask tourne
+
 ```bash
 curl.exe http://127.0.0.1:5000/
+
 curl.exe http://127.0.0.1:5000/items
-curl.exe -X POST -H "Content-Type: application/json" -d "{\"name\": \"Premier Item\"}" http://127.0.0.1:5000/items
+
+   pour ajouter un items : 
+
+# Windows PowerShell:
+curl.exe -X POST -H "Content-Type: application/json" -d '{\"name\": \"Achraf test\"}' http://127.0.0.1:5000/items
+
+# Linux / macOS / Git Bash:
+curl -X POST -H "Content-Type: application/json" -d '{"name": "Achraf test"}' http://127.0.0.1:5000/items
+
+
 curl.exe http://127.0.0.1:5000/items/0
 ```
 
 ### Run unit tests
+
+Make sure the virtual environment `(venv)` is activated before executing any `python` or `unittest` command.
 
 ```bash
 python -m unittest discover tests
@@ -193,7 +220,9 @@ Pull and run from Docker Hub:
 docker pull achraf2026/msc-de1-flask-app:1.0.1
 docker run -d -p 5000:5000 --name verify-pulled achraf2026/msc-de1-flask-app:1.0.1
 curl.exe http://127.0.0.1:5000/
-docker stop verify-pulled && docker rm verify-pulled
+docker stop verify-pulled
+docker rm verify-pulled
+
 ```
 
 > ***Traceability: the image and tag used in*** ***`k8s/deployment.yaml`*** ***is exactly*** ***`achraf2026/msc-de1-flask-app:1.0.1`***.
@@ -259,7 +288,9 @@ In another terminal:
 ```bash
 curl.exe http://127.0.0.1:8080/
 curl.exe http://127.0.0.1:8080/items
-curl.exe -X POST -H "Content-Type: application/json" -d "{\"name\": \"Item cree dans Kubernetes\"}" http://127.0.0.1:8080/items
+
+curl.exe -X POST -H "Content-Type: application/json" -d '{\"name\": \"Item cree dans Kubernetes\"}' http://127.0.0.1:8080/items
+
 curl.exe http://127.0.0.1:8080/items
 ```
 
@@ -267,7 +298,7 @@ Expected responses:
 
 * **`Hello, Flask!`**
 * **`{"items":[]}`** then the newly created item after POST
-
+* ** `{"items":[{"name":"Item cree dans Kubernetes"}`
 ---
 
 ## 11. How to Delete / Clean the Local Cluster
@@ -379,28 +410,30 @@ achraf2026/msc-de1-flask-app:1.0.1
 
 ## Project Structure
 
-```text
 msc-de1-distributed-systems-docker-k8s/
-├── app/
-├── tests/
-├── evidence/
-├── kind/
-│   └── kind-config.yaml
-├── k8s/
-│   ├── namespace.yaml
-│   ├── configmap.yaml
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   └── network-policy.yaml
-├── security/
-│   ├── README.md
-│   ├── vulnerability-scan.txt
-│   └── sbom.spdx.json
-├── .dockerignore
-├── .gitignore
-├── compose.yaml
-├── Dockerfile
-├── README.md
-├── requirements.txt
-└── run.py
-```
+├── app/                       # Original Flask application source code
+├── tests/                     # Unit tests to validate baseline functionality
+├── evidence/                  # Screenshot proofs confirming all required steps are met and fully functional
+├── kind/                      # Local Kubernetes cluster configuration
+│   └── kind-config.yaml       # Defines the 3-node cluster topology (1 control-plane, 2 workers)
+├── k8s/                       # Kubernetes declarative manifests
+│   ├── namespace.yaml         # Creates the isolated 'msc-de1-project' namespace
+│   ├── configmap.yaml         # Stores non-sensitive configuration (PORT, FLASK_RUN_HOST)
+│   ├── deployment.yaml        # Manages 3 replicas, security contexts, probes, and resource limits
+│   ├── service.yaml           # ClusterIP service for internal load balancing across pods
+│   └── network-policy.yaml    # Restricts inbound (ingress) and outbound (egress) network traffic
+├── security/                  # Security reports and vulnerability analysis
+│   ├── README.md              # Detailed security report (risk reduction, mitigations, non-root execution)
+│   ├── vulnerability-scan.txt # Docker Scout CVE scan output proving 0 Critical vulnerabilities after OS patching
+│   └── sbom.spdx.json         # Software Bill of Materials (SBOM) listing all packages in SPDX format
+├── .dockerignore              # Excludes local/unnecessary files from the Docker build context to reduce image size
+├── .gitignore                 # Prevents secrets, virtual environments, and temp files from being committed to Git
+├── compose.yaml               # Docker Compose file for local execution (hardened with read-only fs & dropped capabilities)
+├── Dockerfile                 # Instructions to build the secure, minimal, non-root Python Docker image
+├── README.md                  # Main project documentation (this file)
+├── requirements.txt           # Python application dependencies
+└── run.py                     # App entry point, improved to bind to 0.0.0.0 for containerized access
+
+
+CONTACT : 
+  Achraf.gounadfa@aivancity.education

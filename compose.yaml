@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      image: achraf2026/msc-de1-flask-app:1.0.1
+    image: achraf2026/msc-de1-flask-app:1.0.1
     container_name: flask-compose-app
     ports:
       - "5000:5000"
@@ -14,14 +14,12 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
     restart: unless-stopped
 
-    # --- Sécurité : privilèges réduits ---
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
     user: "1000:1000"
 
-    # --- Sécurité : système de fichiers en lecture seule ---
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=32m
