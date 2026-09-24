@@ -409,7 +409,6 @@ achraf2026/msc-de1-flask-app:1.0.1
 ```
 
 ## Project Structure
-
 msc-de1-distributed-systems-docker-k8s/
 ├── app/                       # Original Flask application source code
 ├── tests/                     # Unit tests to validate baseline functionality
